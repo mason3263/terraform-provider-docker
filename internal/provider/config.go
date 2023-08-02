@@ -263,7 +263,7 @@ func (c *ProviderConfig) MakeClient(
 			})
 		*/
 
-		log.Printf("[INFO] Found cached client! Hash:%s Host:%s", configHash, config.Host)
+		log.Printf("[INFO] Found cached client! Hash:%d Host:%s", configHash, config.Host)
 
 		return dockerClient, nil
 	}
@@ -327,7 +327,7 @@ func (c *ProviderConfig) MakeClient(
 	}
 
 	c.clientCache[configHash] = dockerClient
-	log.Printf("[INFO] New client with Hash:%s Host:%s", configHash, config.Host)
+	log.Printf("[INFO] New client with Hash:%d Host:%s", configHash, config.Host)
 	/*
 		tflog.Info(ctx, "New client with", map[string]interface{}{
 			"Hash": configHash,

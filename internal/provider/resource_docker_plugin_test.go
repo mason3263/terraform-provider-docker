@@ -394,7 +394,11 @@ func testAccPluginCreated(resourceName string, plugin *types.Plugin) resource.Te
 			return fmt.Errorf("No ID is set")
 		}
 
-		client := testAccProvider.Meta().(*ProviderConfig).DockerClient
+		client, err2 := testAccProvider.Meta().(*ProviderConfig).MakeClient(ctx, nil)
+		if err2 != nil {
+			return err2
+		}
+
 		inspectedPlugin, _, err := client.PluginInspectWithRaw(ctx, rs.Primary.ID)
 		if err != nil {
 			return fmt.Errorf("Plugin with ID '%s': %w", rs.Primary.ID, err)

@@ -205,7 +205,10 @@ func TestAccDockerImage_destroy(t *testing.T) {
 					continue
 				}
 
-				client := testAccProvider.Meta().(*ProviderConfig).DockerClient
+				client, err2 := testAccProvider.Meta().(*ProviderConfig).MakeClient(ctx, nil)
+				if err2 != nil {
+					return err2
+				}
 				_, _, err := client.ImageInspectWithRaw(ctx, rs.Primary.Attributes["name"])
 				if err != nil {
 					return err
@@ -378,7 +381,11 @@ func testAccDockerImageDestroy(ctx context.Context, s *terraform.State) error {
 			continue
 		}
 
-		client := testAccProvider.Meta().(*ProviderConfig).DockerClient
+		client, err2 := testAccProvider.Meta().(*ProviderConfig).MakeClient(ctx, nil)
+		if err2 != nil {
+			return err2
+		}
+
 		_, _, err := client.ImageInspectWithRaw(ctx, rs.Primary.Attributes["name"])
 		if err == nil {
 			return fmt.Errorf("Image still exists")
@@ -613,7 +620,11 @@ func testAccImageCreated(resourceName string, image *types.ImageInspect) resourc
 		// so we need to strip away the name
 		strippedID := strings.Replace(rs.Primary.ID, name, "", -1)
 
-		client := testAccProvider.Meta().(*ProviderConfig).DockerClient
+		client, err2 := testAccProvider.Meta().(*ProviderConfig).MakeClient(ctx, nil)
+		if err2 != nil {
+			return err2
+		}
+
 		inspectedImage, _, err := client.ImageInspectWithRaw(ctx, strippedID)
 		if err != nil {
 			return fmt.Errorf("Image with ID '%s': %w", strippedID, err)

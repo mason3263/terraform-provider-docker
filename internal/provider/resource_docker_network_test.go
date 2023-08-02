@@ -133,7 +133,11 @@ func testAccNetwork(n string, network *types.NetworkResource) resource.TestCheck
 			return fmt.Errorf("No ID is set")
 		}
 
-		client := testAccProvider.Meta().(*ProviderConfig).DockerClient
+		client, err2 := testAccProvider.Meta().(*ProviderConfig).MakeClient(ctx, nil)
+		if err2 != nil {
+			return err2
+		}
+
 		networks, err := client.NetworkList(ctx, types.NetworkListOptions{})
 		if err != nil {
 			return err
@@ -251,7 +255,11 @@ func TestAccDockerNetwork_ingress(t *testing.T) {
 }
 
 func removeSwarmIngressNetwork(ctx context.Context, t *testing.T) {
-	client := testAccProvider.Meta().(*ProviderConfig).DockerClient
+	client, err2 := testAccProvider.Meta().(*ProviderConfig).MakeClient(ctx, nil)
+	if err2 != nil {
+		t.Errorf("failed to list swarm networks: %v", err2)
+	}
+
 	networks, err := client.NetworkList(ctx, types.NetworkListOptions{})
 	if err != nil {
 		t.Errorf("failed to list swarm networks: %v", err)
@@ -270,7 +278,10 @@ func removeSwarmIngressNetwork(ctx context.Context, t *testing.T) {
 }
 
 func nodeLeaveSwarm(ctx context.Context, t *testing.T) error {
-	client := testAccProvider.Meta().(*ProviderConfig).DockerClient
+	client, err2 := testAccProvider.Meta().(*ProviderConfig).MakeClient(ctx, nil)
+	if err2 != nil {
+		return err2
+	}
 
 	force := true
 	err := client.SwarmLeave(ctx, force)
