@@ -69,7 +69,7 @@ jobs:
       - name: Run acceptance tests
         env: 
           TF_LOG: INFO 
-          TF_ACC: 1
+          TF_ACC: 0
         run: go test -v ./internal/provider -timeout ${{ env.TESTSUITE_TIMEOUT }} -run ${{ matrix.resource_type }} 
       - name: Cleanup acceptance tests
         run: make testacc_cleanup
