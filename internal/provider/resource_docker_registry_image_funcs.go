@@ -21,7 +21,11 @@ import (
 )
 
 func resourceDockerRegistryImageCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ProviderConfig).DockerClient
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.Errorf(fmt.Sprint(errC))
+	}
+
 	providerConfig := meta.(*ProviderConfig)
 	name := d.Get("name").(string)
 	log.Printf("[DEBUG] Creating docker image %s", name)

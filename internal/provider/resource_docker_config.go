@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"log"
 
 	"github.com/docker/docker/api/types/swarm"
@@ -42,7 +43,11 @@ func resourceDockerConfig() *schema.Resource {
 }
 
 func resourceDockerConfigCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ProviderConfig).DockerClient
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.Errorf(fmt.Sprint(errC))
+	}
+
 	data, _ := base64.StdEncoding.DecodeString(d.Get("data").(string))
 
 	configSpec := swarm.ConfigSpec{
@@ -62,7 +67,10 @@ func resourceDockerConfigCreate(ctx context.Context, d *schema.ResourceData, met
 }
 
 func resourceDockerConfigRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ProviderConfig).DockerClient
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.Errorf(fmt.Sprint(errC))
+	}
 	config, _, err := client.ConfigInspectWithRaw(ctx, d.Id())
 	if err != nil {
 		log.Printf("[WARN] Config (%s) not found, removing from state", d.Id())
@@ -80,7 +88,10 @@ func resourceDockerConfigRead(ctx context.Context, d *schema.ResourceData, meta 
 }
 
 func resourceDockerConfigDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ProviderConfig).DockerClient
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.Errorf(fmt.Sprint(errC))
+	}
 	err := client.ConfigRemove(ctx, d.Id())
 	if err != nil {
 		return diag.FromErr(err)

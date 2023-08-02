@@ -26,6 +26,14 @@ func resourceDockerImage() *schema.Resource {
 				ForceNew:    true,
 			},
 
+			"override": overrideSchema,
+
+			"host_id": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Point to an docker_host id. This ressource uses the connection parameters from the docker_host ressource",
+			},
+
 			"image_id": {
 				Type:        schema.TypeString,
 				Description: "The ID of the image (as seen when executing `docker inspect` on the image). Can be used to reference the image via its ID in other resources.",

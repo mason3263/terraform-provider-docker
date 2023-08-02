@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"io/ioutil"
 	"log"
 	"strings"
@@ -14,9 +15,12 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
-func resourceDockerPluginCreate(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*ProviderConfig).DockerClient
-	ctx := context.Background()
+func resourceDockerPluginCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.Errorf(fmt.Sprint(errC))
+	}
+
 	pluginName := d.Get("name").(string)
 	alias := d.Get("alias").(string)
 	log.Printf("[DEBUG] Install a Docker plugin " + pluginName)
@@ -32,7 +36,7 @@ func resourceDockerPluginCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 	body, err := client.PluginInstall(ctx, alias, opts)
 	if err != nil {
-		return fmt.Errorf("install a Docker plugin "+pluginName+": %w", err)
+		return diag.Errorf("install a Docker plugin "+pluginName+": %w", err)
 	}
 	_, _ = ioutil.ReadAll(body)
 	key := pluginName
@@ -41,15 +45,18 @@ func resourceDockerPluginCreate(d *schema.ResourceData, meta interface{}) error 
 	}
 	plugin, _, err := client.PluginInspectWithRaw(ctx, key)
 	if err != nil {
-		return fmt.Errorf("inspect a Docker plugin "+key+": %w", err)
+		return diag.Errorf("inspect a Docker plugin "+key+": %w", err)
 	}
 	setDockerPlugin(d, plugin)
 	return nil
 }
 
-func resourceDockerPluginRead(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*ProviderConfig).DockerClient
-	ctx := context.Background()
+func resourceDockerPluginRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.Errorf(fmt.Sprint(errC))
+	}
+
 	pluginID := d.Id()
 	plugin, _, err := client.PluginInspectWithRaw(ctx, pluginID)
 	if err != nil {
@@ -65,15 +72,18 @@ func resourceDockerPluginRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-func resourceDockerPluginDelete(d *schema.ResourceData, meta interface{}) error {
-	client := meta.(*ProviderConfig).DockerClient
-	ctx := context.Background()
+func resourceDockerPluginDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.Errorf(fmt.Sprint(errC))
+	}
+
 	pluginID := d.Id()
 	log.Printf("[DEBUG] Remove a Docker plugin " + pluginID)
 	if err := client.PluginRemove(ctx, pluginID, types.PluginRemoveOptions{
 		Force: d.Get("force_destroy").(bool),
 	}); err != nil {
-		return fmt.Errorf("remove the Docker plugin "+pluginID+": %w", err)
+		return diag.Errorf("remove the Docker plugin "+pluginID+": %w", err)
 	}
 	return nil
 }
@@ -212,7 +222,11 @@ func pluginSet(ctx context.Context, d *schema.ResourceData, cl *client.Client) e
 }
 
 func pluginUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) (gErr error) {
-	cl := meta.(*ProviderConfig).DockerClient
+	cl, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return errC
+	}
+
 	o, n := d.GetChange("enabled")
 	oldEnabled, newEnabled := o.(bool), n.(bool)
 	if d.HasChange("env") {
@@ -257,12 +271,11 @@ func pluginUpdate(ctx context.Context, d *schema.ResourceData, meta interface{})
 	return nil
 }
 
-func resourceDockerPluginUpdate(d *schema.ResourceData, meta interface{}) error {
-	ctx := context.Background()
+func resourceDockerPluginUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	if err := pluginUpdate(ctx, d, meta); err != nil {
-		return err
+		return diag.Errorf(fmt.Sprint(err))
 	}
 	// call the read function to update the resource's state.
 	// https://learn.hashicorp.com/tutorials/terraform/provider-update?in=terraform/providers#implement-update
-	return resourceDockerPluginRead(d, meta)
+	return resourceDockerPluginRead(ctx, d, meta)
 }

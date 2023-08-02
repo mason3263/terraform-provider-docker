@@ -2,13 +2,18 @@ package provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
 func resourceDockerTagCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ProviderConfig).DockerClient
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.Errorf(fmt.Sprint(errC))
+	}
+
 	sourceImage := d.Get("source_image").(string)
 	targetImage := d.Get("target_image").(string)
 	err := client.ImageTag(ctx, sourceImage, targetImage)

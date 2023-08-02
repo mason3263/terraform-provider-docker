@@ -12,6 +12,7 @@ import (
 
 	"github.com/docker/cli/cli/config/configfile"
 	"github.com/docker/docker/api/types"
+	dockerclient "github.com/docker/docker/client"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -32,6 +33,48 @@ func init() {
 	// 	}
 	// 	return strings.TrimSpace(desc)
 	// }
+}
+
+var overrideSchema = &schema.Schema{
+	Type:        schema.TypeList,
+	Description: "Override Provider config",
+	Optional:    true,
+	MaxItems:    1,
+	Elem: &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"host": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "The Docker daemon address",
+			},
+			"ssh_opts": {
+				Type:        schema.TypeList,
+				Optional:    true,
+				Elem:        &schema.Schema{Type: schema.TypeString},
+				Description: "Additional SSH option flags to be appended when using `ssh://` protocol",
+			},
+			"ca_material": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "PEM-encoded content of Docker host CA certificate",
+			},
+			"cert_material": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "PEM-encoded content of Docker client certificate",
+			},
+			"key_material": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "PEM-encoded content of Docker client private key",
+			},
+			"cert_path": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				Description: "Path to directory with Docker TLS config",
+			},
+		},
+	},
 }
 
 // New creates the Docker provider
@@ -84,7 +127,6 @@ func New(version string) func() *schema.Provider {
 					DefaultFunc: schema.EnvDefaultFunc("DOCKER_KEY_MATERIAL", ""),
 					Description: "PEM-encoded content of Docker client private key",
 				},
-
 				"cert_path": {
 					Type:        schema.TypeString,
 					Optional:    true,
@@ -177,7 +219,8 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 		for i, s := range SSHOptsI {
 			SSHOpts[i] = s.(string)
 		}
-		config := Config{
+
+		defaultConfig := Config{
 			Host:     d.Get("host").(string),
 			SSHOpts:  SSHOpts,
 			Ca:       d.Get("ca_material").(string),
@@ -186,17 +229,31 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 			CertPath: d.Get("cert_path").(string),
 		}
 
-		client, err := config.NewClient()
-		if err != nil {
-			return nil, diag.Errorf("Error initializing Docker client: %s", err)
-		}
+		// Remove
+		/*
+			config := Config{
+				Host:     d.Get("host").(string),
+				SSHOpts:  SSHOpts,
+				Ca:       d.Get("ca_material").(string),
+				Cert:     d.Get("cert_material").(string),
+				Key:      d.Get("key_material").(string),
+				CertPath: d.Get("cert_path").(string),
+			}
 
-		_, err = client.Ping(ctx)
-		if err != nil {
-			return nil, diag.Errorf("Error pinging Docker server: %s", err)
-		}
+			client, err := config.NewClient()
+			if err != nil {
+				return nil, diag.Errorf("Error initializing Docker client: %s", err)
+			}
+		*/
+
+		//_, err = client.Ping(ctx)
+		//if err != nil {
+		//	return nil, diag.Errorf("Error pinging Docker server: %s", err)
+		//}
+		//Remove
 
 		authConfigs := &AuthConfigs{}
+		var err error
 
 		if v, ok := d.GetOk("registry_auth"); ok {
 			authConfigs, err = providerSetToRegistryAuth(v.(*schema.Set))
@@ -206,8 +263,13 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 		}
 
 		providerConfig := ProviderConfig{
-			DockerClient: client,
-			AuthConfigs:  authConfigs,
+			// Remove
+			// DockerClient: client,
+			// Remove
+			DefaultConfig: &defaultConfig,
+			Hosts:         map[string]*schema.ResourceData{},
+			AuthConfigs:   authConfigs,
+			clientCache:   map[uint64]*dockerclient.Client{},
 		}
 
 		return &providerConfig, nil

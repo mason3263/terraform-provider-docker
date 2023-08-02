@@ -48,7 +48,10 @@ var creationTime time.Time
 
 func resourceDockerContainerCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	var err error
-	client := meta.(*ProviderConfig).DockerClient
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.Errorf(fmt.Sprint(errC))
+	}
 	authConfigs := meta.(*ProviderConfig).AuthConfigs
 	image := d.Get("image").(string)
 	_, err = findImage(ctx, image, client, authConfigs, "")
@@ -591,7 +594,10 @@ func resourceDockerContainerRead(ctx context.Context, d *schema.ResourceData, me
 		containerReadRefreshTimeoutMilliseconds = containerReadRefreshTimeoutMillisecondsDefault
 	}
 	log.Printf("[INFO] Waiting for container: '%s' to run: max '%v seconds'", d.Id(), containerReadRefreshTimeoutMilliseconds/1000)
-	client := meta.(*ProviderConfig).DockerClient
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.Errorf(fmt.Sprint(errC))
+	}
 
 	apiContainer, err := fetchDockerContainer(ctx, d.Id(), client)
 	if err != nil {
@@ -768,7 +774,10 @@ func resourceDockerContainerRead(ctx context.Context, d *schema.ResourceData, me
 func resourceDockerContainerReadRefreshFunc(ctx context.Context,
 	d *schema.ResourceData, meta interface{}) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
-		client := meta.(*ProviderConfig).DockerClient
+		client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+		if errC != nil {
+			return nil, "pending", errC
+		}
 		containerID := d.Id()
 
 		var container types.ContainerJSON
@@ -852,7 +861,10 @@ func resourceDockerContainerUpdate(ctx context.Context, d *schema.ResourceData, 
 				}
 				updateConfig.Resources.MemorySwap = a
 			}
-			client := meta.(*ProviderConfig).DockerClient
+			client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+			if errC != nil {
+				return diag.Errorf(fmt.Sprint(errC))
+			}
 			_, err := client.ContainerUpdate(ctx, d.Id(), updateConfig)
 			if err != nil {
 				return diag.Errorf("Unable to update a container: %v", err)
@@ -864,7 +876,10 @@ func resourceDockerContainerUpdate(ctx context.Context, d *schema.ResourceData, 
 }
 
 func resourceDockerContainerDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ProviderConfig).DockerClient
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.Errorf(fmt.Sprint(errC))
+	}
 
 	if !d.Get("attach").(bool) {
 		// Stop the container before removing if destroy_grace_seconds is defined

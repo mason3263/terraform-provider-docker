@@ -6,10 +6,10 @@ GOLANGCI_VERSION = 1.49.0
 
 # Values to install the provider locally for testing purposes
 HOSTNAME=registry.terraform.io
-NAMESPACE=kreuzwerker
+NAMESPACE=bierwirth-it
 NAME=docker
 BINARY=terraform-provider-${NAME}
-VERSION=9.9.9
+VERSION=3.0.3
 OS_ARCH=$(shell go env GOHOSTOS)_$(shell go env GOHOSTARCH)
 
 .PHONY: build test testacc fmt fmtcheck test-compile website-link-check website-lint website-lint-fix

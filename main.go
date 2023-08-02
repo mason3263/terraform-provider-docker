@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 	"github.com/terraform-providers/terraform-provider-docker/internal/provider"
@@ -39,6 +40,7 @@ func main() {
 		plugin.Serve(debugOpts)
 		return
 	}
+	log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
 
 	plugin.Serve(opts)
 }

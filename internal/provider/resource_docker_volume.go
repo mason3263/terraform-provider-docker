@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -78,7 +79,10 @@ func resourceDockerVolume() *schema.Resource {
 }
 
 func resourceDockerVolumeCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ProviderConfig).DockerClient
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.Errorf(fmt.Sprint(errC))
+	}
 
 	createOpts := volume.VolumeCreateBody{}
 
@@ -108,7 +112,10 @@ func resourceDockerVolumeCreate(ctx context.Context, d *schema.ResourceData, met
 }
 
 func resourceDockerVolumeRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ProviderConfig).DockerClient
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.Errorf(fmt.Sprint(errC))
+	}
 
 	volume, err := client.VolumeInspect(ctx, d.Id())
 
@@ -134,7 +141,7 @@ func resourceDockerVolumeDelete(ctx context.Context, d *schema.ResourceData, met
 	stateConf := &resource.StateChangeConf{
 		Pending:    []string{"in_use"},
 		Target:     []string{"removed"},
-		Refresh:    resourceDockerVolumeRemoveRefreshFunc(d.Id(), meta),
+		Refresh:    resourceDockerVolumeRemoveRefreshFunc(ctx, d, meta),
 		Timeout:    volumeReadRefreshTimeout,
 		MinTimeout: volumeReadRefreshWaitBeforeRefreshes,
 		Delay:      volumeReadRefreshDelay,
@@ -150,13 +157,17 @@ func resourceDockerVolumeDelete(ctx context.Context, d *schema.ResourceData, met
 	return nil
 }
 
-func resourceDockerVolumeRemoveRefreshFunc(
-	volumeID string, meta interface{}) resource.StateRefreshFunc {
+func resourceDockerVolumeRemoveRefreshFunc(ctx context.Context, d *schema.ResourceData, meta interface{}) resource.StateRefreshFunc {
 	return func() (interface{}, string, error) {
-		client := meta.(*ProviderConfig).DockerClient
+		volumeID := d.Id()
+		client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+		if errC != nil {
+			return nil, "", errC
+		}
+
 		forceDelete := true
 
-		if err := client.VolumeRemove(context.Background(), volumeID, forceDelete); err != nil {
+		if err := client.VolumeRemove(ctx, volumeID, forceDelete); err != nil {
 			if containsIgnorableErrorMessage(err.Error(), "volume is in use") {
 				log.Printf("[INFO] Volume with id '%v' is still in use", volumeID)
 				return volumeID, "in_use", nil

@@ -42,6 +42,8 @@ func resourceDockerContainer() *schema.Resource {
 				ForceNew:    true,
 			},
 
+			"override": overrideSchema,
+
 			"rm": {
 				Type:        schema.TypeBool,
 				Description: "If `true`, then the container will be automatically removed when it exits. Defaults to `false`.",

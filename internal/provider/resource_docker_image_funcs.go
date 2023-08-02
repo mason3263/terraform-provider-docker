@@ -22,7 +22,7 @@ import (
 	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
-	"github.com/mitchellh/go-homedir"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/moby/buildkit/session"
 	"github.com/pkg/errors"
 )
@@ -30,7 +30,10 @@ import (
 const minBuildkitDockerVersion = "1.39"
 
 func resourceDockerImageCreate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ProviderConfig).DockerClient
+	client, err := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if err != nil {
+		return diag.Errorf(fmt.Sprint(err))
+	}
 	imageName := d.Get("name").(string)
 
 	if value, ok := d.GetOk("build"); ok {
@@ -53,7 +56,10 @@ func resourceDockerImageCreate(ctx context.Context, d *schema.ResourceData, meta
 }
 
 func resourceDockerImageRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ProviderConfig).DockerClient
+	client, err := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if err != nil {
+		return diag.Errorf(fmt.Sprint(err))
+	}
 	var data Data
 	if err := fetchLocalImages(ctx, &data, client); err != nil {
 		return diag.Errorf("Error reading docker image list: %s", err)
@@ -86,20 +92,26 @@ func resourceDockerImageRead(ctx context.Context, d *schema.ResourceData, meta i
 func resourceDockerImageUpdate(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	// We need to re-read in case switching parameters affects
 	// the value of "latest" or others
-	client := meta.(*ProviderConfig).DockerClient
-	imageName := d.Get("name").(string)
-	_, err := findImage(ctx, imageName, client, meta.(*ProviderConfig).AuthConfigs, d.Get("platform").(string))
+	client, err := meta.(*ProviderConfig).MakeClient(ctx, d)
 	if err != nil {
-		return diag.Errorf("Unable to read Docker image into resource: %s", err)
+		return diag.Errorf(fmt.Sprint(err))
+	}
+	imageName := d.Get("name").(string)
+	_, err2 := findImage(ctx, imageName, client, meta.(*ProviderConfig).AuthConfigs, d.Get("platform").(string))
+	if err2 != nil {
+		return diag.Errorf("Unable to read Docker image into resource: %s", err2)
 	}
 
 	return resourceDockerImageRead(ctx, d, meta)
 }
 
 func resourceDockerImageDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
-	client := meta.(*ProviderConfig).DockerClient
+	client, err := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if err != nil {
+		return diag.Errorf(fmt.Sprint(err))
+	}
 	// TODO mavogel: add retries. see e.g. service updateFailsAndRollbackConvergeConfig test
-	err := removeImage(ctx, d, client)
+	err = removeImage(ctx, d, client)
 	if err != nil {
 		return diag.Errorf("Unable to remove Docker image: %s", err)
 	}
@@ -152,7 +164,7 @@ func removeImage(ctx context.Context, d *schema.ResourceData, client *client.Cli
 	}
 
 	if foundImage != nil {
-		imageDeleteResponseItems, err := client.ImageRemove(ctx, imageName, types.ImageRemoveOptions{
+		imageDeleteResponseItems, err := client.ImageRemove(ctx, foundImage.ID, types.ImageRemoveOptions{
 			Force: d.Get("force_remove").(bool),
 		})
 		if err != nil {

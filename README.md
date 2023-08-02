@@ -1,22 +1,26 @@
 <a href="https://docker.com">
-    <img src="https://raw.githubusercontent.com/kreuzwerker/terraform-provider-docker/master/assets/docker-logo.png" alt="Docker logo" title="Docker" align="right" height="100" />
+    <img src="https://raw.githubusercontent.com/bierwirth-it/terraform-provider-docker/master/assets/docker-logo.png" alt="Docker logo" title="Docker" align="right" height="100" style="background: white; border: white solid 5px" />
 </a>
 <a href="https://terraform.io">
-    <img src="https://raw.githubusercontent.com/kreuzwerker/terraform-provider-docker/master/assets/terraform-logo.png" alt="Terraform logo" title="Terraform" align="right" height="100" />
+    <img src="https://raw.githubusercontent.com/bierwirth-it/terraform-provider-docker/master/assets/terraform-logo.png" alt="Terraform logo" title="Terraform" align="right" height="100" style="background: white; border: white solid 0" />
 </a>
-<a href="https://kreuzwerker.de">
-    <img src="https://raw.githubusercontent.com/kreuzwerker/terraform-provider-docker/master/assets/xw-logo.png" alt="Kreuzwerker logo" title="Kreuzwerker" align="right" height="100" />
+<a href="https://bierwirth-it.de">
+    <img src="http://bierwirth-it.de/img/logo.png" alt="Bierwirth-IT logo" title="Bierwirth-IT" align="right" height="100" style="background: white; border: white solid 5px" border="white solid5px" />
 </a>
 
-# Terraform Provider for Docker
+# Terraform Provider for multihost Docker
 
-[![Release](https://img.shields.io/github/v/release/kreuzwerker/terraform-provider-docker)](https://github.com/kreuzwerker/terraform-provider-docker/releases)
+[![Release](https://img.shields.io/github/v/release/kreuzwerker/terraform-provider-docker)](https://github.com/bierwirth-it/terraform-provider-docker/releases)
 [![Installs](https://img.shields.io/badge/dynamic/json?logo=terraform&label=installs&query=$.data.attributes.downloads&url=https%3A%2F%2Fregistry.terraform.io%2Fv2%2Fproviders%2F713)](https://registry.terraform.io/providers/kreuzwerker/docker)
 [![Registry](https://img.shields.io/badge/registry-doc%40latest-lightgrey?logo=terraform)](https://registry.terraform.io/providers/kreuzwerker/docker/latest/docs)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/kreuzwerker/terraform-provider-docker/blob/main/LICENSE)  
-[![Go Status](https://github.com/kreuzwerker/terraform-provider-docker/workflows/Acc%20Tests/badge.svg)](https://github.com/kreuzwerker/terraform-provider-docker/actions)
-[![Lint Status](https://github.com/kreuzwerker/terraform-provider-docker/workflows/golangci-lint/badge.svg)](https://github.com/kreuzwerker/terraform-provider-docker/actions)
+[![Go Status](https://github.com/kreuzwerker/terraform-provider-docker/workflows/Acc%20Tests/badge.svg)](https://github.com/bierwirth-it/terraform-provider-docker/actions)
+[![Lint Status](https://github.com/kreuzwerker/terraform-provider-docker/workflows/golangci-lint/badge.svg)](https://github.com/bierwirth-it/terraform-provider-docker/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/kreuzwerker/terraform-provider-docker)](https://goreportcard.com/report/github.com/kreuzwerker/terraform-provider-docker)  
+
+## Forked from
+
+https://github.com/kreuzwerker/terraform-provider-docker
 
 ## Documentation
 
@@ -37,7 +41,7 @@ terraform {
     # We recommend pinning to the specific version of the Docker Provider you're using
     # since new versions are released frequently
     docker = {
-      source  = "kreuzwerker/docker"
+      source  = "bierwirth-it/docker"
       version = "3.0.2"
     }
   }
@@ -97,7 +101,7 @@ resource "docker_service" "nginx_service" {
 
 
 ```sh
-$ git clone git@github.com:kreuzwerker/terraform-provider-docker
+$ git clone git@github.com:bierwirth-it/terraform-provider-docker
 $ make build
 ```
 
@@ -110,8 +114,3 @@ To contribute, please read the contribution guidelines: [Contributing to Terrafo
 ## License
 
 The Terraform Provider Docker is available to everyone under the terms of the Mozilla Public License Version 2.0. [Take a look the LICENSE file](LICENSE).
-
-
-## Stargazers over time
-
-[![Stargazers over time](https://starchart.cc/kreuzwerker/terraform-provider-docker.svg)](https://starchart.cc/kreuzwerker/terraform-provider-docker)

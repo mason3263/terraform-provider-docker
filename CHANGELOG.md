@@ -1,5 +1,16 @@
 
-<a name="v3.0.2"></a>
+<a name="v3.0.3"></a>
+## [v3.0.3](https://github.com/bierwirth-it/terraform-provider-docker/compare/v3.0.2...v3.0.3) (2023-07-31)
+
+### Docs
+
+* Add samples for Multihost Docker
+
+### Feat
+
+* Multihost Docker support 
+
+
 ## [v3.0.2](https://github.com/kreuzwerker/terraform-provider-docker/compare/v3.0.1...v3.0.2) (2023-03-17)
 
 ### Docs
