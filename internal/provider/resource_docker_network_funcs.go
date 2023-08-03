@@ -4,13 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"log"
 	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/network"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -87,7 +87,7 @@ func resourceDockerNetworkCreate(ctx context.Context, d *schema.ResourceData, me
 func resourceDockerNetworkRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	log.Printf("[INFO] Waiting for network: '%s' to expose all fields: max '%v seconds'", d.Id(), networkReadRefreshTimeout)
 
-	stateConf := &resource.StateChangeConf{
+	stateConf := &retry.StateChangeConf{
 		Pending:    []string{"pending"},
 		Target:     []string{"all_fields", "removed"},
 		Refresh:    resourceDockerNetworkReadRefreshFunc(ctx, d, meta),
@@ -108,7 +108,7 @@ func resourceDockerNetworkRead(ctx context.Context, d *schema.ResourceData, meta
 func resourceDockerNetworkDelete(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	log.Printf("[INFO] Waiting for network: '%s' to be removed: max '%v seconds'", d.Id(), networkRemoveRefreshTimeout)
 
-	stateConf := &resource.StateChangeConf{
+	stateConf := &retry.StateChangeConf{
 		Pending:    []string{"pending"},
 		Target:     []string{"removed"},
 		Refresh:    resourceDockerNetworkRemoveRefreshFunc(ctx, d, meta),
@@ -151,7 +151,7 @@ func ipamConfigSetToIpamConfigs(ipamConfigSet *schema.Set) []network.IPAMConfig 
 }
 
 func resourceDockerNetworkReadRefreshFunc(ctx context.Context,
-	d *schema.ResourceData, meta interface{}) resource.StateRefreshFunc {
+	d *schema.ResourceData, meta interface{}) retry.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 		networkID := d.Id()
 
@@ -201,7 +201,7 @@ func resourceDockerNetworkReadRefreshFunc(ctx context.Context,
 }
 
 func resourceDockerNetworkRemoveRefreshFunc(ctx context.Context,
-	d *schema.ResourceData, meta interface{}) resource.StateRefreshFunc {
+	d *schema.ResourceData, meta interface{}) retry.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 
 		networkID := d.Id()

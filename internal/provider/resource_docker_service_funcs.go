@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"log"
 	"strings"
 	"time"
@@ -15,7 +16,6 @@ import (
 	"github.com/docker/docker/api/types/swarm"
 	"github.com/docker/docker/client"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -54,7 +54,7 @@ func resourceDockerServiceCreate(ctx context.Context, d *schema.ResourceData, me
 		convergeConfig := createConvergeConfig(v.([]interface{}))
 		log.Printf("[INFO] Waiting for Service '%s' to be created with timeout: %v", service.ID, convergeConfig.timeoutRaw)
 		timeout, _ := time.ParseDuration(convergeConfig.timeoutRaw)
-		stateConf := &resource.StateChangeConf{
+		stateConf := &retry.StateChangeConf{
 			Pending:    serviceCreatePendingStates,
 			Target:     []string{"running", "complete"},
 			Refresh:    resourceDockerServiceCreateRefreshFunc(ctx, d, service.ID, meta),
@@ -84,7 +84,7 @@ func resourceDockerServiceCreate(ctx context.Context, d *schema.ResourceData, me
 func resourceDockerServiceRead(ctx context.Context, d *schema.ResourceData, meta interface{}) diag.Diagnostics {
 	log.Printf("[INFO] Waiting for service: '%s' to expose all fields: max '%v seconds'", d.Id(), 30)
 
-	stateConf := &resource.StateChangeConf{
+	stateConf := &retry.StateChangeConf{
 		Pending:    []string{"pending"},
 		Target:     []string{"all_fields", "removed"},
 		Refresh:    resourceDockerServiceReadRefreshFunc(ctx, d, meta),
@@ -103,7 +103,7 @@ func resourceDockerServiceRead(ctx context.Context, d *schema.ResourceData, meta
 }
 
 func resourceDockerServiceReadRefreshFunc(ctx context.Context,
-	d *schema.ResourceData, meta interface{}) resource.StateRefreshFunc {
+	d *schema.ResourceData, meta interface{}) retry.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 		serviceID := d.Id()
 		client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
@@ -201,7 +201,7 @@ func resourceDockerServiceUpdate(ctx context.Context, d *schema.ResourceData, me
 		convergeConfig := createConvergeConfig(v.([]interface{}))
 		log.Printf("[INFO] Waiting for Service '%s' to be updated with timeout: %v", service.ID, convergeConfig.timeoutRaw)
 		timeout, _ := time.ParseDuration(convergeConfig.timeoutRaw)
-		stateConf := &resource.StateChangeConf{
+		stateConf := &retry.StateChangeConf{
 			Pending:    serviceUpdatePendingStates,
 			Target:     []string{"completed"},
 			Refresh:    resourceDockerServiceUpdateRefreshFunc(ctx, d, service.ID, meta),
@@ -356,7 +356,7 @@ func (err *DidNotConvergeError) Error() string {
 
 // resourceDockerServiceCreateRefreshFunc refreshes the state of a service when it is created and needs to converge
 func resourceDockerServiceCreateRefreshFunc(ctx context.Context, d *schema.ResourceData,
-	serviceID string, meta interface{}) resource.StateRefreshFunc {
+	serviceID string, meta interface{}) retry.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 		client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
 		if errC != nil {
@@ -409,7 +409,7 @@ func resourceDockerServiceCreateRefreshFunc(ctx context.Context, d *schema.Resou
 
 // resourceDockerServiceUpdateRefreshFunc refreshes the state of a service when it is updated and needs to converge
 func resourceDockerServiceUpdateRefreshFunc(ctx context.Context, d *schema.ResourceData,
-	serviceID string, meta interface{}) resource.StateRefreshFunc {
+	serviceID string, meta interface{}) retry.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 		client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
 		if errC != nil {
