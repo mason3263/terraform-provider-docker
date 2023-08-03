@@ -29,8 +29,8 @@ data "docker_image" "otherVM" {
 # deploy image to multiple destinations
 locals {
   hosts = {
-    "100": { name: "remote-host100", ip_address: "192.168.111.100" }
-    "101": { name: "remote-host101", ip_address: "192.168.111.101" }
+    "100" : { name : "remote-host100", ip_address : "192.168.111.100" }
+    "101" : { name : "remote-host101", ip_address : "192.168.111.101" }
   }
 }
 

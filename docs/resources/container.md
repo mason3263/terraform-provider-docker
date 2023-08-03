@@ -68,6 +68,7 @@ resource "docker_image" "ubuntu" {
 - `must_run` (Boolean) If `true`, then the Docker container will be kept running. If `false`, then as long as the container exists, Terraform assumes it is successful. Defaults to `true`.
 - `network_mode` (String) Network mode of the container.
 - `networks_advanced` (Block Set) The networks the container is attached to (see [below for nested schema](#nestedblock--networks_advanced))
+- `override` (Block List, Max: 1) Override Provider config (see [below for nested schema](#nestedblock--override))
 - `pid_mode` (String) he PID (Process) Namespace mode for the container. Either `container:<name|id>` or `host`.
 - `ports` (Block List) Publish a container's port(s) to the host. (see [below for nested schema](#nestedblock--ports))
 - `privileged` (Boolean) If `true`, the container runs in privileged mode.
@@ -225,6 +226,19 @@ Optional:
 - `aliases` (Set of String) The network aliases of the container in the specific network.
 - `ipv4_address` (String) The IPV4 address of the container in the specific network.
 - `ipv6_address` (String) The IPV6 address of the container in the specific network.
+
+
+<a id="nestedblock--override"></a>
+### Nested Schema for `override`
+
+Optional:
+
+- `ca_material` (String) PEM-encoded content of Docker host CA certificate
+- `cert_material` (String) PEM-encoded content of Docker client certificate
+- `cert_path` (String) Path to directory with Docker TLS config
+- `host` (String) The Docker daemon address
+- `key_material` (String) PEM-encoded content of Docker client private key
+- `ssh_opts` (List of String) Additional SSH option flags to be appended when using `ssh://` protocol
 
 
 <a id="nestedblock--ports"></a>
