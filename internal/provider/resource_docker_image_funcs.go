@@ -353,8 +353,9 @@ func buildDockerImage(ctx context.Context, rawBuild map[string]interface{}, imag
 	}
 	buildOptions.Dockerfile = relDockerfile
 
+	backCtx := context.Background()
 	var response types.ImageBuildResponse
-	response, err = client.ImageBuild(ctx, buildCtx, buildOptions)
+	response, err = client.ImageBuild(backCtx, buildCtx, buildOptions)
 	if err != nil {
 		return err
 	}

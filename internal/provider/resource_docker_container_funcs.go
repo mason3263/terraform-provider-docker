@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
 	"io/ioutil"
 	"log"
 	"os"
@@ -24,7 +25,6 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/docker/go-units"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
@@ -609,7 +609,7 @@ func resourceDockerContainerRead(ctx context.Context, d *schema.ResourceData, me
 		return nil
 	}
 
-	stateConf := &resource.StateChangeConf{
+	stateConf := &retry.StateChangeConf{
 		Pending:    []string{"pending"},
 		Target:     []string{"running"},
 		Refresh:    resourceDockerContainerReadRefreshFunc(ctx, d, meta),
@@ -772,7 +772,7 @@ func resourceDockerContainerRead(ctx context.Context, d *schema.ResourceData, me
 }
 
 func resourceDockerContainerReadRefreshFunc(ctx context.Context,
-	d *schema.ResourceData, meta interface{}) resource.StateRefreshFunc {
+	d *schema.ResourceData, meta interface{}) retry.StateRefreshFunc {
 	return func() (interface{}, string, error) {
 		client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
 		if errC != nil {

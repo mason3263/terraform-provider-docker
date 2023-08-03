@@ -109,7 +109,7 @@ func buildHTTPClientFromBytes(caPEMCert, certPEMBlock, keyPEMBlock []byte) (*htt
 	} else {
 		caPool := x509.NewCertPool()
 		if !caPool.AppendCertsFromPEM(caPEMCert) {
-			return nil, errors.New("Could not add RootCA pem")
+			return nil, errors.New("could not add RootCA pem")
 		}
 		tlsConfig.RootCAs = caPool
 	}
@@ -120,7 +120,7 @@ func buildHTTPClientFromBytes(caPEMCert, certPEMBlock, keyPEMBlock []byte) (*htt
 }
 
 // defaultTransport returns a new http.Transport with similar default values to
-// http.DefaultTransport, but with idle connections and keepalives disabled.
+// http.DefaultTransport, but with idle connections and keepalive disabled.
 func defaultTransport() *http.Transport {
 	transport := defaultPooledTransport()
 	transport.DisableKeepAlives = true
@@ -256,13 +256,6 @@ func (c *ProviderConfig) MakeClient(
 	configHash := config.Hash()
 	dockerClient, found := c.clientCache[configHash]
 	if found {
-		/*
-			tflog.Info(ctx, "Found cached client!", map[string]interface{}{
-				"Hash": configHash,
-				"Host": config.Host,
-			})
-		*/
-
 		log.Printf("[INFO] Found cached client! Hash:%d Host:%s", configHash, config.Host)
 
 		return dockerClient, nil
@@ -283,7 +276,7 @@ func (c *ProviderConfig) MakeClient(
 
 		// Note: don't change the order here, because the custom client
 		// needs to be set first them we overwrite the other options: host, version
-		dockerClient, err = client.NewClientWithOpts(
+		dockerClient, _ = client.NewClientWithOpts(
 			client.WithHTTPClient(httpClient),
 			client.WithHost(config.Host),
 			client.WithAPIVersionNegotiation(),
@@ -305,7 +298,7 @@ func (c *ProviderConfig) MakeClient(
 			return nil, err
 		}
 		if helper != nil {
-			dockerClient, err = client.NewClientWithOpts(
+			dockerClient, _ = client.NewClientWithOpts(
 				client.WithHost(helper.Host),
 				client.WithDialContext(helper.Dialer),
 				client.WithAPIVersionNegotiation(),
@@ -328,12 +321,6 @@ func (c *ProviderConfig) MakeClient(
 
 	c.clientCache[configHash] = dockerClient
 	log.Printf("[INFO] New client with Hash:%d Host:%s", configHash, config.Host)
-	/*
-		tflog.Info(ctx, "New client with", map[string]interface{}{
-			"Hash": configHash,
-			"Host": config.Host,
-		})
-	*/
 	return dockerClient, nil
 }
 

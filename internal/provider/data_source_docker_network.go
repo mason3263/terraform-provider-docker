@@ -102,7 +102,10 @@ func dataSourceDockerNetworkRead(ctx context.Context, d *schema.ResourceData, me
 		return diag.Errorf("One of id or name must be assigned")
 	}
 
-	client, err := meta.(*ProviderConfig).MakeClient(ctx, d)
+	client, errC := meta.(*ProviderConfig).MakeClient(ctx, d)
+	if errC != nil {
+		return diag.FromErr(errC)
+	}
 
 	network, err := client.NetworkInspect(ctx, name.(string), types.NetworkInspectOptions{})
 	if err != nil {
