@@ -9,6 +9,7 @@ import (
 	"os/user"
 	"runtime"
 	"strings"
+	"sync"
 
 	"github.com/docker/cli/cli/config/configfile"
 	"github.com/docker/docker/api/types"
@@ -269,6 +270,7 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 			DefaultConfig: &defaultConfig,
 			Hosts:         map[string]*schema.ResourceData{},
 			AuthConfigs:   authConfigs,
+			mutex:         &sync.Mutex{},
 			clientCache:   map[uint64]*dockerclient.Client{},
 		}
 

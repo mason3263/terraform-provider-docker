@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/docker/cli/cli/connhelper"
@@ -216,6 +217,7 @@ type ProviderConfig struct {
 	DefaultConfig *Config
 	Hosts         map[string]*schema.ResourceData
 	AuthConfigs   *AuthConfigs
+	mutex         *sync.Mutex
 	clientCache   map[uint64]*client.Client
 }
 
@@ -254,7 +256,11 @@ func (c *ProviderConfig) MakeClient(
 
 	config := c.getConfig(d)
 	configHash := config.Hash()
+
+	c.mutex.Lock()
 	dockerClient, found := c.clientCache[configHash]
+	c.mutex.Unlock()
+
 	if found {
 		log.Printf("[INFO] Found cached client! Hash:%d Host:%s", configHash, config.Host)
 
@@ -319,7 +325,10 @@ func (c *ProviderConfig) MakeClient(
 		return nil, fmt.Errorf("error pinging Docker server: %s", err)
 	}
 
+	c.mutex.Lock()
 	c.clientCache[configHash] = dockerClient
+	c.mutex.Unlock()
+
 	log.Printf("[INFO] New client with Hash:%d Host:%s", configHash, config.Host)
 	return dockerClient, nil
 }
