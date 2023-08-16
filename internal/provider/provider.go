@@ -13,8 +13,6 @@ import (
 
 	"github.com/docker/cli/cli/config/configfile"
 	"github.com/docker/docker/api/types"
-	dockerclient "github.com/docker/docker/client"
-
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
@@ -270,8 +268,7 @@ func configure(version string, p *schema.Provider) func(context.Context, *schema
 			DefaultConfig: &defaultConfig,
 			Hosts:         map[string]*schema.ResourceData{},
 			AuthConfigs:   authConfigs,
-			mutex:         &sync.Mutex{},
-			clientCache:   map[uint64]*dockerclient.Client{},
+			clientCache:   sync.Map{},
 		}
 
 		return &providerConfig, nil

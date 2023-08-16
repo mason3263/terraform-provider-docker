@@ -21,6 +21,8 @@ func resourceDockerRegistryImage() *schema.Resource {
 				ForceNew:    true,
 			},
 
+			"override": overrideSchema,
+
 			"keep_remotely": {
 				Type:        schema.TypeBool,
 				Description: "If true, then the Docker image won't be deleted on destroy operation. If this is false, it will delete the image from the docker registry on destroy operation. Defaults to `false`",

@@ -217,8 +217,7 @@ type ProviderConfig struct {
 	DefaultConfig *Config
 	Hosts         map[string]*schema.ResourceData
 	AuthConfigs   *AuthConfigs
-	mutex         *sync.Mutex
-	clientCache   map[uint64]*client.Client
+	clientCache   sync.Map
 }
 
 func (c *ProviderConfig) getConfig(d *schema.ResourceData) *Config {
@@ -257,14 +256,12 @@ func (c *ProviderConfig) MakeClient(
 	config := c.getConfig(d)
 	configHash := config.Hash()
 
-	c.mutex.Lock()
-	dockerClient, found := c.clientCache[configHash]
-	c.mutex.Unlock()
+	cached, found := c.clientCache.Load(configHash)
 
 	if found {
 		log.Printf("[INFO] Found cached client! Hash:%d Host:%s", configHash, config.Host)
 
-		return dockerClient, nil
+		return cached.(*client.Client), nil
 	}
 	if config.Cert != "" || config.Key != "" {
 		if config.Cert == "" || config.Key == "" {
@@ -320,14 +317,13 @@ func (c *ProviderConfig) MakeClient(
 	if err != nil {
 		return nil, err
 	}
+
+	c.clientCache.LoadOrStore(configHash, dockerClient)
+
 	_, err = dockerClient.Ping(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error pinging Docker server: %s", err)
 	}
-
-	c.mutex.Lock()
-	c.clientCache[configHash] = dockerClient
-	c.mutex.Unlock()
 
 	log.Printf("[INFO] New client with Hash:%d Host:%s", configHash, config.Host)
 	return dockerClient, nil
