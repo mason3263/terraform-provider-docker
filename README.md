@@ -42,7 +42,6 @@ terraform {
     # since new versions are released frequently
     docker = {
       source  = "bierwirth-it/docker"
-      version = "3.0.2"
     }
   }
 }
