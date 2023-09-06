@@ -36,7 +36,7 @@ type Config struct {
 }
 
 func NewConfig(d *schema.ResourceData) *Config {
-	log.Println("NewConfig")
+	//log.Println("NewConfig")
 
 	config := Config{
 		Host:     "",
@@ -259,7 +259,7 @@ func (c *ProviderConfig) MakeClient(
 	cached, found := c.clientCache.Load(configHash)
 
 	if found {
-		log.Printf("[INFO] Found cached client! Hash:%d Host:%s", configHash, config.Host)
+		log.Printf("[DEBUG] Found cached client! Hash:%d Host:%s", configHash, config.Host)
 
 		return cached.(*client.Client), nil
 	}
@@ -325,7 +325,7 @@ func (c *ProviderConfig) MakeClient(
 		return nil, fmt.Errorf("error pinging Docker server: %s", err)
 	}
 
-	log.Printf("[INFO] New client with Hash:%d Host:%s", configHash, config.Host)
+	log.Printf("[DEBUG] New client with Hash:%d Host:%s", configHash, config.Host)
 	return dockerClient, nil
 }
 
