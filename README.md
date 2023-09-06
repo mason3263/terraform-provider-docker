@@ -59,7 +59,7 @@ variable "hosts" {
 provider "docker" {
 }
 
-# Create a docker image resource
+# Create a docker image resource on N hosts
 # -> docker pull nginx:latest
 resource "docker_image" "nginx" {
   for_each   = var.hosts
@@ -70,7 +70,7 @@ resource "docker_image" "nginx" {
   name         = "nginx:latest"
 }
 
-# Create a docker container resource
+# Create a docker container resource on N hosts
 # -> same as 'docker run --name nginx -p8080:80 -d nginx:latest'
 resource "docker_container" "nginx" {
   for_each   = var.hosts
