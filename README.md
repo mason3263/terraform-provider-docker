@@ -30,7 +30,7 @@ Do you want to migrate from `v2.x` to `v3.x`? Please read the [migration guide](
 
 ## Example usage
 
-Take a look at the examples in the [documentation](https://registry.terraform.io/providers/bierwirth-it/docker/3.0.3/docs) of the registry
+Take a look at the examples in the [documentation](https://registry.terraform.io/providers/bierwirth-it/docker/3.0.4/docs) of the registry
 or use the following example:
 
 
@@ -42,6 +42,7 @@ terraform {
     # since new versions are released frequently
     docker = {
       source  = "bierwirth-it/docker"
+      version = "3.0.4"
     }
   }
 }

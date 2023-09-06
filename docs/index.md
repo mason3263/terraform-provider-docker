@@ -25,7 +25,7 @@ terraform {
   required_providers {
     docker = {
       source  = "bierwirth-it/docker"
-      version = "3.0.3"
+      version = "3.0.4"
     }
   }
 }
@@ -50,7 +50,7 @@ Terraform 0.12 and earlier:
 
 ```terraform
 provider "docker" {
-  version = "~> 3.0.3"
+  version = "~> 3.0.4"
   host    = "unix:///var/run/docker.sock"
 }
 
