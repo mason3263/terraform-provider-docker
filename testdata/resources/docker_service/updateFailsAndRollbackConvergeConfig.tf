@@ -13,7 +13,7 @@ data "docker_registry_image" "tftest_image" {
 resource "docker_image" "tftest_image" {
   provider      = "docker.private"
   name          = data.docker_registry_image.tftest_image.name
-  keep_locally  = false
+  keep_locally  = true
   force_remove  = true
   pull_triggers = [data.docker_registry_image.tftest_image.sha256_digest]
 }
