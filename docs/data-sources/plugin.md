@@ -31,6 +31,7 @@ data "docker_plugin" "by_id" {
 
 - `alias` (String) The alias of the Docker plugin. If the tag is omitted, `:latest` is complemented to the attribute value.
 - `id` (String) The ID of the plugin, which has precedence over the `alias` of both are given
+- `override` (Block List, Max: 1) Override Provider config (see [below for nested schema](#nestedblock--override))
 
 ### Read-Only
 
@@ -39,5 +40,17 @@ data "docker_plugin" "by_id" {
 - `grant_all_permissions` (Boolean) If true, grant all permissions necessary to run the plugin
 - `name` (String) The plugin name. If the tag is omitted, `:latest` is complemented to the attribute value.
 - `plugin_reference` (String) The Docker Plugin Reference
+
+<a id="nestedblock--override"></a>
+### Nested Schema for `override`
+
+Optional:
+
+- `ca_material` (String) PEM-encoded content of Docker host CA certificate
+- `cert_material` (String) PEM-encoded content of Docker client certificate
+- `cert_path` (String) Path to directory with Docker TLS config
+- `host` (String) The Docker daemon address
+- `key_material` (String) PEM-encoded content of Docker client private key
+- `ssh_opts` (List of String) Additional SSH option flags to be appended when using `ssh://` protocol
 
 

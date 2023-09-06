@@ -25,6 +25,7 @@ description: |-
 - `discard_headers` (Boolean) Discard headers that docker appends to each log entry
 - `follow` (Boolean)
 - `logs_list_string_enabled` (Boolean) If true populate computed value `logs_list_string`
+- `override` (Block List, Max: 1) Override Provider config (see [below for nested schema](#nestedblock--override))
 - `show_stderr` (Boolean)
 - `show_stdout` (Boolean)
 - `since` (String)
@@ -36,5 +37,17 @@ description: |-
 
 - `id` (String) The ID of this resource.
 - `logs_list_string` (List of String) List of container logs, each element is a line.
+
+<a id="nestedblock--override"></a>
+### Nested Schema for `override`
+
+Optional:
+
+- `ca_material` (String) PEM-encoded content of Docker host CA certificate
+- `cert_material` (String) PEM-encoded content of Docker client certificate
+- `cert_path` (String) Path to directory with Docker TLS config
+- `host` (String) The Docker daemon address
+- `key_material` (String) PEM-encoded content of Docker client private key
+- `ssh_opts` (List of String) Additional SSH option flags to be appended when using `ssh://` protocol
 
 

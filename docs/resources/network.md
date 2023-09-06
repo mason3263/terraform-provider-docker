@@ -38,6 +38,7 @@ resource "docker_network" "private_network" {
 - `ipv6` (Boolean) Enable IPv6 networking. Defaults to `false`.
 - `labels` (Block Set) User-defined key/value metadata (see [below for nested schema](#nestedblock--labels))
 - `options` (Map of String) Only available with bridge networks. See [bridge options docs](https://docs.docker.com/engine/reference/commandline/network_create/#bridge-driver-options) for more details.
+- `override` (Block List, Max: 1) Override Provider config (see [below for nested schema](#nestedblock--override))
 
 ### Read-Only
 
@@ -62,6 +63,19 @@ Required:
 
 - `label` (String) Name of the label
 - `value` (String) Value of the label
+
+
+<a id="nestedblock--override"></a>
+### Nested Schema for `override`
+
+Optional:
+
+- `ca_material` (String) PEM-encoded content of Docker host CA certificate
+- `cert_material` (String) PEM-encoded content of Docker client certificate
+- `cert_path` (String) Path to directory with Docker TLS config
+- `host` (String) The Docker daemon address
+- `key_material` (String) PEM-encoded content of Docker client private key
+- `ssh_opts` (List of String) Additional SSH option flags to be appended when using `ssh://` protocol
 
 ## Import
 

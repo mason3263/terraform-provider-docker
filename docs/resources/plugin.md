@@ -48,6 +48,7 @@ resource "docker_plugin" "sample-volume-plugin" {
 - `force_disable` (Boolean) If true, then the plugin is disabled forcibly
 - `grant_all_permissions` (Boolean) If true, grant all permissions necessary to run the plugin
 - `grant_permissions` (Block Set) Grant specific permissions only (see [below for nested schema](#nestedblock--grant_permissions))
+- `override` (Block List, Max: 1) Override Provider config (see [below for nested schema](#nestedblock--override))
 
 ### Read-Only
 
@@ -61,6 +62,19 @@ Required:
 
 - `name` (String) The name of the permission
 - `value` (Set of String) The value of the permission
+
+
+<a id="nestedblock--override"></a>
+### Nested Schema for `override`
+
+Optional:
+
+- `ca_material` (String) PEM-encoded content of Docker host CA certificate
+- `cert_material` (String) PEM-encoded content of Docker client certificate
+- `cert_path` (String) Path to directory with Docker TLS config
+- `host` (String) The Docker daemon address
+- `key_material` (String) PEM-encoded content of Docker client private key
+- `ssh_opts` (List of String) Additional SSH option flags to be appended when using `ssh://` protocol
 
 ## Import
 

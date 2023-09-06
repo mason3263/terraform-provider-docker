@@ -25,6 +25,10 @@ data "docker_network" "main" {
 
 - `name` (String) The name of the Docker network.
 
+### Optional
+
+- `override` (Block List, Max: 1) Override Provider config (see [below for nested schema](#nestedblock--override))
+
 ### Read-Only
 
 - `driver` (String) The driver of the Docker network. Possible values are `bridge`, `host`, `overlay`, `macvlan`. See [network docs](https://docs.docker.com/network/#network-drivers) for more details.
@@ -33,6 +37,19 @@ data "docker_network" "main" {
 - `ipam_config` (Set of Object) The IPAM configuration options (see [below for nested schema](#nestedatt--ipam_config))
 - `options` (Map of String) Only available with bridge networks. See [bridge options docs](https://docs.docker.com/engine/reference/commandline/network_create/#bridge-driver-options) for more details.
 - `scope` (String) Scope of the network. One of `swarm`, `global`, or `local`.
+
+<a id="nestedblock--override"></a>
+### Nested Schema for `override`
+
+Optional:
+
+- `ca_material` (String) PEM-encoded content of Docker host CA certificate
+- `cert_material` (String) PEM-encoded content of Docker client certificate
+- `cert_path` (String) Path to directory with Docker TLS config
+- `host` (String) The Docker daemon address
+- `key_material` (String) PEM-encoded content of Docker client private key
+- `ssh_opts` (List of String) Additional SSH option flags to be appended when using `ssh://` protocol
+
 
 <a id="nestedatt--ipam_config"></a>
 ### Nested Schema for `ipam_config`

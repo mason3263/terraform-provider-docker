@@ -20,9 +20,25 @@ Creates a docker tag. It has the exact same functionality as the `docker tag` co
 - `source_image` (String) Name of the source image.
 - `target_image` (String) Name of the target image.
 
+### Optional
+
+- `override` (Block List, Max: 1) Override Provider config (see [below for nested schema](#nestedblock--override))
+
 ### Read-Only
 
 - `id` (String) The ID of this resource.
 - `source_image_id` (String) ImageID of the source image in the format of `sha256:<<ID>>`
+
+<a id="nestedblock--override"></a>
+### Nested Schema for `override`
+
+Optional:
+
+- `ca_material` (String) PEM-encoded content of Docker host CA certificate
+- `cert_material` (String) PEM-encoded content of Docker client certificate
+- `cert_path` (String) Path to directory with Docker TLS config
+- `host` (String) The Docker daemon address
+- `key_material` (String) PEM-encoded content of Docker client private key
+- `ssh_opts` (List of String) Additional SSH option flags to be appended when using `ssh://` protocol
 
 

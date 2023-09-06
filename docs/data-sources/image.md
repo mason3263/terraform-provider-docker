@@ -66,9 +66,25 @@ data "docker_image" "otherVMs" {
 
 - `name` (String) The name of the Docker image, including any tags or SHA256 repo digests.
 
+### Optional
+
+- `override` (Block List, Max: 1) Override Provider config (see [below for nested schema](#nestedblock--override))
+
 ### Read-Only
 
 - `id` (String) The ID of this resource.
 - `repo_digest` (String) The image sha256 digest in the form of `repo[:tag]@sha256:<hash>`. It may be empty in the edge case where the local image was pulled from a repo, tagged locally, and then referred to in the data source by that local name/tag.
+
+<a id="nestedblock--override"></a>
+### Nested Schema for `override`
+
+Optional:
+
+- `ca_material` (String) PEM-encoded content of Docker host CA certificate
+- `cert_material` (String) PEM-encoded content of Docker client certificate
+- `cert_path` (String) Path to directory with Docker TLS config
+- `host` (String) The Docker daemon address
+- `key_material` (String) PEM-encoded content of Docker client private key
+- `ssh_opts` (List of String) Additional SSH option flags to be appended when using `ssh://` protocol
 
 

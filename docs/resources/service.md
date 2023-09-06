@@ -327,6 +327,7 @@ resource "docker_service" "foo" {
 - `endpoint_spec` (Block List, Max: 1) Properties that can be configured to access and load balance a service (see [below for nested schema](#nestedblock--endpoint_spec))
 - `labels` (Block Set) User-defined key/value metadata (see [below for nested schema](#nestedblock--labels))
 - `mode` (Block List, Max: 1) Scheduling mode for the service (see [below for nested schema](#nestedblock--mode))
+- `override` (Block List, Max: 1) Override Provider config (see [below for nested schema](#nestedblock--override))
 - `rollback_config` (Block List, Max: 1) Specification for the rollback strategy of the service (see [below for nested schema](#nestedblock--rollback_config))
 - `update_config` (Block List, Max: 1) Specification for the update strategy of the service (see [below for nested schema](#nestedblock--update_config))
 
@@ -708,6 +709,19 @@ Optional:
 
 - `replicas` (Number) The amount of replicas of the service. Defaults to `1`
 
+
+
+<a id="nestedblock--override"></a>
+### Nested Schema for `override`
+
+Optional:
+
+- `ca_material` (String) PEM-encoded content of Docker host CA certificate
+- `cert_material` (String) PEM-encoded content of Docker client certificate
+- `cert_path` (String) Path to directory with Docker TLS config
+- `host` (String) The Docker daemon address
+- `key_material` (String) PEM-encoded content of Docker client private key
+- `ssh_opts` (List of String) Additional SSH option flags to be appended when using `ssh://` protocol
 
 
 <a id="nestedblock--rollback_config"></a>
