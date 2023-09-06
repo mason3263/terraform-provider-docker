@@ -24,13 +24,13 @@ https://github.com/kreuzwerker/terraform-provider-docker
 
 ## Documentation
 
-The documentation for the provider is available on the [Terraform Registry](https://registry.terraform.io/providers/kreuzwerker/docker/latest/docs).
+The documentation for the provider is available on the [Terraform Registry](https://registry.terraform.io/providers/bierwirth-it/docker/latest/docs).
 
 Do you want to migrate from `v2.x` to `v3.x`? Please read the [migration guide](docs/v2_v3_migration.md)
 
 ## Example usage
 
-Take a look at the examples in the [documentation](https://registry.terraform.io/providers/kreuzwerker/docker/3.0.2/docs) of the registry
+Take a look at the examples in the [documentation](https://registry.terraform.io/providers/bierwirth-it/docker/3.0.3/docs) of the registry
 or use the following example:
 
 
@@ -46,6 +46,15 @@ terraform {
   }
 }
 
+variable "hosts" {
+  description = "Map of variables for hosts"
+  default = {
+    "001": { name: "sample", ip: "192.168.0.91" }
+    "002": { name: "sample", ip: "192.168.0.92" }
+    "003": { name: "sample", ip: "192.168.0.93" }
+  }
+}
+
 # Configure the docker provider
 provider "docker" {
 }
@@ -53,43 +62,28 @@ provider "docker" {
 # Create a docker image resource
 # -> docker pull nginx:latest
 resource "docker_image" "nginx" {
+  for_each   = var.hosts
+  override {
+    host = "ssh://root@${each.value.ip}:22"
+  }
+
   name         = "nginx:latest"
-  keep_locally = true
 }
 
 # Create a docker container resource
 # -> same as 'docker run --name nginx -p8080:80 -d nginx:latest'
 resource "docker_container" "nginx" {
+  for_each   = var.hosts
+  override {
+    host = "ssh://root@${each.value.ip}:22"
+  }
+
   name    = "nginx"
   image   = docker_image.nginx.image_id
 
   ports {
     external = 8080
     internal = 80
-  }
-}
-
-# Or create a service resource
-# -> same as 'docker service create -d -p 8081:80 --name nginx-service --replicas 2 nginx:latest'
-resource "docker_service" "nginx_service" {
-  name = "nginx-service"
-  task_spec {
-    container_spec {
-      image = docker_image.nginx.repo_digest
-    }
-  }
-
-  mode {
-    replicated {
-      replicas = 2
-    }
-  }
-
-  endpoint_spec {
-    ports {
-      published_port = 8081
-      target_port    = 80
-    }
   }
 }
 ```
