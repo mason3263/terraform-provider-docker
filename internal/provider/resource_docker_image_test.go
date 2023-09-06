@@ -126,11 +126,16 @@ func TestAccDockerImage_basic(t *testing.T) {
 	// run a Docker container which refers the Docker image to test "force_remove" option
 	containerName := "test-docker-image-force-remove"
 	ctx := context.Background()
-	if err := exec.Command("docker", "run", "--rm", "-d", "--name", containerName, "alpine:3.16.0", "tail", "-f", "/dev/null").Run(); err != nil {
+	if err := exec.Command("docker", "run", "-d", "--name", containerName, "alpine:3.16.0", "tail", "-f", "/dev/null").Run(); err != nil {
 		t.Fatal(err)
 	}
+	// Stop the Container, because force_remove can omly remove stopped containers!
+	if err := exec.Command("docker", "stop", containerName).Run(); err != nil {
+		t.Logf("failed to stop the Docker container %s: %v", containerName, err)
+	}
+	// Cleanup
 	defer func() {
-		if err := exec.Command("docker", "stop", containerName).Run(); err != nil {
+		if err := exec.Command("docker", "rm", containerName).Run(); err != nil {
 			t.Logf("failed to stop the Docker container %s: %v", containerName, err)
 		}
 	}()
