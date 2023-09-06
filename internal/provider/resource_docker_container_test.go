@@ -887,9 +887,9 @@ func TestAccDockerContainer_uploadAsBase64(t *testing.T) {
 			} else {
 				mode := strconv.FormatInt(header.Mode, 8)
 				if !strings.HasSuffix(mode, filePerm) {
-					return fmt.Errorf("File permissions are incorrect: %s", mode)
+					return fmt.Errorf("File permissions are incorrect: Is %s should be %s", mode, filePerm)
 				}
-				log.Printf("File permissions are correct: %s", mode)
+				log.Printf("File permissions are correct: Is %s should be %s", mode, filePerm)
 			}
 
 			fbuf := new(bytes.Buffer)
@@ -938,7 +938,7 @@ func TestAccDockerContainer_uploadAsBase64(t *testing.T) {
 					testAccContainerRunning("docker_container.foo", &c),
 					// DevSkim: ignore DS173237
 					testCheck("/terraform/test1.txt", "894fc3f56edf2d3a4c5fb5cb71df910f958a2ed8", "744"),
-					testCheck("/terraform/test2.txt", "foobar", "100644"),
+					testCheck("/terraform/test2.txt", "foobar", "644"),
 					resource.TestCheckResourceAttr("docker_container.foo", "name", "tf-test"),
 					resource.TestCheckResourceAttr("docker_container.foo", "upload.#", "2"),
 					resource.TestCheckResourceAttr("docker_container.foo", "upload.0.content", ""),
