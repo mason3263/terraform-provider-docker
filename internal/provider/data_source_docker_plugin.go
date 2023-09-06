@@ -21,6 +21,7 @@ func dataSourceDockerPlugin() *schema.Resource {
 				Description: "The ID of the plugin, which has precedence over the `alias` of both are given",
 				Optional:    true,
 			},
+			"override": overrideSchema,
 			"alias": {
 				Type:        schema.TypeString,
 				Description: "The alias of the Docker plugin. If the tag is omitted, `:latest` is complemented to the attribute value.",

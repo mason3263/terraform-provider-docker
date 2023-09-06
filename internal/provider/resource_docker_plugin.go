@@ -25,6 +25,7 @@ func resourceDockerPlugin() *schema.Resource {
 				DiffSuppressFunc: diffSuppressFuncPluginName,
 				ValidateFunc:     validateFuncPluginName,
 			},
+			"override": overrideSchema,
 			"alias": {
 				Type:        schema.TypeString,
 				Description: "Docker Plugin alias",

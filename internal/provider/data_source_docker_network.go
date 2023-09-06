@@ -17,6 +17,8 @@ func dataSourceDockerNetwork() *schema.Resource {
 		ReadContext: dataSourceDockerNetworkRead,
 
 		Schema: map[string]*schema.Schema{
+			"override": overrideSchema,
+
 			"name": {
 				Type:        schema.TypeString,
 				Description: "The name of the Docker network.",

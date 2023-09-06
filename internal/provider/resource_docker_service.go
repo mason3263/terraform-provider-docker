@@ -51,6 +51,7 @@ func resourceDockerService() *schema.Resource {
 					},
 				},
 			},
+			"override": overrideSchema,
 			"name": {
 				Type:        schema.TypeString,
 				Description: "Name of the service",

@@ -17,6 +17,7 @@ func dataSourceDockerImage() *schema.Resource {
 		ReadContext: dataSourceDockerImageRead,
 
 		Schema: map[string]*schema.Schema{
+			"override": overrideSchema,
 			"name": {
 				Type:        schema.TypeString,
 				Description: "The name of the Docker image, including any tags or SHA256 repo digests.",

@@ -29,6 +29,8 @@ func resourceDockerNetwork() *schema.Resource {
 				ForceNew:    true,
 			},
 
+			"override": overrideSchema,
+
 			"labels": {
 				Type:        schema.TypeSet,
 				Description: "User-defined key/value metadata",
