@@ -39,9 +39,22 @@ resource "docker_image" "image" {
 
 - `insecure_skip_verify` (Boolean) If `true`, the verification of TLS certificates of the server/registry is disabled. Defaults to `false`
 - `keep_remotely` (Boolean) If true, then the Docker image won't be deleted on destroy operation. If this is false, it will delete the image from the docker registry on destroy operation. Defaults to `false`
+- `override` (Block List, Max: 1) Override Provider config (see [below for nested schema](#nestedblock--override))
 - `triggers` (Map of String) A map of arbitrary strings that, when changed, will force the `docker_registry_image` resource to be replaced. This can be used to repush a local image
 
 ### Read-Only
 
 - `id` (String) The ID of this resource.
 - `sha256_digest` (String) The sha256 digest of the image.
+
+<a id="nestedblock--override"></a>
+### Nested Schema for `override`
+
+Optional:
+
+- `ca_material` (String) PEM-encoded content of Docker host CA certificate
+- `cert_material` (String) PEM-encoded content of Docker client certificate
+- `cert_path` (String) Path to directory with Docker TLS config
+- `host` (String) The Docker daemon address
+- `key_material` (String) PEM-encoded content of Docker client private key
+- `ssh_opts` (List of String) Additional SSH option flags to be appended when using `ssh://` protocol
