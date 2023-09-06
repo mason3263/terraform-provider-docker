@@ -29,7 +29,14 @@ func resourceDockerNetwork() *schema.Resource {
 				ForceNew:    true,
 			},
 
-			"override": overrideSchema,
+			"override": {
+				Type:        schema.TypeList,
+				Description: "Override Provider config",
+				Optional:    true,
+				ForceNew:    true,
+				MaxItems:    1,
+				Elem:        overrideSchemaElem,
+			},
 
 			"labels": {
 				Type:        schema.TypeSet,

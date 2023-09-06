@@ -32,7 +32,14 @@ func resourceDockerVolume() *schema.Resource {
 		},
 
 		Schema: map[string]*schema.Schema{
-			"override": overrideSchema,
+			"override": {
+				Type:        schema.TypeList,
+				Description: "Override Provider config",
+				Optional:    true,
+				ForceNew:    true,
+				MaxItems:    1,
+				Elem:        overrideSchemaElem,
+			},
 			"name": {
 				Type:        schema.TypeString,
 				Description: "The name of the Docker volume (will be generated if not provided).",

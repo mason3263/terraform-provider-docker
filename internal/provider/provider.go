@@ -34,46 +34,48 @@ func init() {
 	// }
 }
 
+var overrideSchemaElem = &schema.Resource{
+	Schema: map[string]*schema.Schema{
+		"host": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "The Docker daemon address",
+		},
+		"ssh_opts": {
+			Type:        schema.TypeList,
+			Optional:    true,
+			Elem:        &schema.Schema{Type: schema.TypeString},
+			Description: "Additional SSH option flags to be appended when using `ssh://` protocol",
+		},
+		"ca_material": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "PEM-encoded content of Docker host CA certificate",
+		},
+		"cert_material": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "PEM-encoded content of Docker client certificate",
+		},
+		"key_material": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "PEM-encoded content of Docker client private key",
+		},
+		"cert_path": {
+			Type:        schema.TypeString,
+			Optional:    true,
+			Description: "Path to directory with Docker TLS config",
+		},
+	},
+}
+
 var overrideSchema = &schema.Schema{
 	Type:        schema.TypeList,
 	Description: "Override Provider config",
 	Optional:    true,
 	MaxItems:    1,
-	Elem: &schema.Resource{
-		Schema: map[string]*schema.Schema{
-			"host": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "The Docker daemon address",
-			},
-			"ssh_opts": {
-				Type:        schema.TypeList,
-				Optional:    true,
-				Elem:        &schema.Schema{Type: schema.TypeString},
-				Description: "Additional SSH option flags to be appended when using `ssh://` protocol",
-			},
-			"ca_material": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "PEM-encoded content of Docker host CA certificate",
-			},
-			"cert_material": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "PEM-encoded content of Docker client certificate",
-			},
-			"key_material": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "PEM-encoded content of Docker client private key",
-			},
-			"cert_path": {
-				Type:        schema.TypeString,
-				Optional:    true,
-				Description: "Path to directory with Docker TLS config",
-			},
-		},
-	},
+	Elem:        overrideSchemaElem,
 }
 
 // New creates the Docker provider
