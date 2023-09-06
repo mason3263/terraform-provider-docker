@@ -79,7 +79,8 @@ resource "docker_container" "nginx" {
   }
 
   name    = "nginx"
-  image   = docker_image.nginx.image_id
+  image   = docker_image.nginx[each.key].image_id
+  hostname = "${each.value.name}-${each.key}"
 
   ports {
     external = 8080
