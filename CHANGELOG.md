@@ -1,3 +1,10 @@
+<a name="v3.0.5"></a>
+## [v3.0.5](https://github.com/bierwirth-it/terraform-provider-docker/compare/v3.0.4...v3.0.5) (2024-05-28)
+
+### Feat
+
+* Sync with kreuzwerker-master
+
 <a name="v3.0.4"></a>
 ## [v3.0.4](https://github.com/bierwirth-it/terraform-provider-docker/compare/v3.0.3...v3.0.4) (2023-09-06)
 

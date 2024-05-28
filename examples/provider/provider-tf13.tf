@@ -2,7 +2,7 @@ terraform {
   required_providers {
     docker = {
       source  = "bierwirth-it/docker"
-      version = "3.0.4"
+      version = "3.0.5"
     }
   }
 }
