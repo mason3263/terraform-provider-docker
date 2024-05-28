@@ -9,8 +9,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/retry"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -452,7 +450,7 @@ func resourceDockerContainerCreate(ctx context.Context, d *schema.ResourceData, 
 				contentToUpload = string(decoded)
 			}
 			if source != "" {
-				sourceContent, err := ioutil.ReadFile(source)
+				sourceContent, err := os.ReadFile(source)
 				if err != nil {
 					return diag.Errorf("could not read file: %s", err)
 				}
