@@ -5,8 +5,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -747,7 +745,7 @@ func TestAccDockerContainer_uploadSource(t *testing.T) {
 
 	wd, _ := os.Getwd()
 	testFile := strings.ReplaceAll(filepath.Join(wd, "..", "..", "scripts", "testing", "testingFile"), "\\", "\\\\")
-	testFileContent, _ := ioutil.ReadFile(testFile)
+	testFileContent, _ := os.ReadFile(testFile)
 
 	testCheck := func(*terraform.State) error {
 		client, errC := testAccProvider.Meta().(*ProviderConfig).MakeClient(ctx, nil)
@@ -827,7 +825,7 @@ func TestAccDockerContainer_uploadSourceHash(t *testing.T) {
 
 	wd, _ := os.Getwd()
 	testFile := strings.ReplaceAll(filepath.Join(wd, "..", "..", "scripts", "testing", "testingFile"), "\\", "\\\\")
-	hash, _ := ioutil.ReadFile(testFile + ".base64")
+	hash, _ := os.ReadFile(testFile + ".base64")
 	grabFirstCheck := func(*terraform.State) error {
 		firstRunId = c.ID
 		return nil
@@ -887,7 +885,7 @@ func TestAccDockerContainer_uploadAsBase64(t *testing.T) {
 			} else {
 				mode := strconv.FormatInt(header.Mode, 8)
 				if !strings.HasSuffix(mode, filePerm) {
-					return fmt.Errorf("File permissions are incorrect: Is %s should be %s", mode, filePerm)
+					return fmt.Errorf("File permissions are incorrect: %s; wanted: %s", mode, filePerm)
 				}
 				log.Printf("File permissions are correct: Is %s should be %s", mode, filePerm)
 			}

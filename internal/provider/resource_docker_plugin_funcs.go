@@ -4,8 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
-	"io/ioutil"
+	"io"
 	"log"
 	"strings"
 
@@ -38,7 +37,7 @@ func resourceDockerPluginCreate(ctx context.Context, d *schema.ResourceData, met
 	if err != nil {
 		return diag.Errorf("install a Docker plugin "+pluginName+": %w", err)
 	}
-	_, _ = ioutil.ReadAll(body)
+	_, _ = io.ReadAll(body)
 	key := pluginName
 	if alias != "" {
 		key = alias
